@@ -9,8 +9,14 @@ function startBackendServer(port) {
   const app = express();
   app.use(express.json());
 
-  // Serve frontend static files
-  app.use(express.static(path.join(__dirname, '../frontend')));
+  // Serve frontend static files (no caching during development)
+  app.use(express.static(path.join(__dirname, '../frontend'), {
+    etag: false,
+    lastModified: false,
+    setHeaders: (res) => {
+      res.set('Cache-Control', 'no-store');
+    }
+  }));
 
   // GET /timeline - paginated consolidated locations (reverse chronological)
   app.get('/timeline', (req, res) => {
@@ -110,6 +116,80 @@ function startBackendServer(port) {
       ORDER BY country, state
     `).all();
     res.json(states);
+  });
+
+  // GET /places - unique places grouped by country > state
+  app.get('/places', (req, res) => {
+    const db = getDatabase();
+    // Get all entries with IDs for edit/delete
+    const rows = db.prepare(`
+      SELECT id, city, state, country
+      FROM consolidated_locations
+      ORDER BY country, state, city
+    `).all();
+
+    // Group: country > state > unique cities (with IDs for each)
+    const byCountry = {};
+    const cityKey = (city, state, country) => `${city}|${state}|${country}`;
+    const cityIds = {};  // cityKey -> [id, id, ...]
+
+    for (const row of rows) {
+      const key = cityKey(row.city, row.state, row.country);
+      if (!cityIds[key]) cityIds[key] = [];
+      cityIds[key].push(row.id);
+
+      if (!byCountry[row.country]) byCountry[row.country] = {};
+      if (!byCountry[row.country][row.state]) byCountry[row.country][row.state] = new Set();
+      byCountry[row.country][row.state].add(row.city);
+    }
+
+    const countries = Object.entries(byCountry)
+      .map(([country, states]) => {
+        const stateList = Object.entries(states)
+          .map(([state, citySet]) => {
+            const cities = [...citySet].sort().map(city => ({
+              city,
+              ids: cityIds[cityKey(city, state, country)]
+            }));
+            return { state, cities };
+          })
+          .sort((a, b) => b.cities.length - a.cities.length);
+        const placeCount = stateList.reduce((sum, s) => sum + s.cities.length, 0);
+        return { country, states: stateList, placeCount };
+      })
+      .sort((a, b) => b.placeCount - a.placeCount);
+
+    const uniquePlaces = Object.keys(cityIds).length;
+    const totalCountries = countries.length;
+    res.json({ countries, totalPlaces: uniquePlaces, totalCountries });
+  });
+
+  // PATCH /places/:id - edit a consolidated location's city name
+  app.patch('/places/:id', (req, res) => {
+    const db = getDatabase();
+    const { city } = req.body;
+    if (!city || typeof city !== 'string') {
+      return res.status(400).json({ error: 'city is required' });
+    }
+    const result = db.prepare('UPDATE consolidated_locations SET city = ?, updated_at = ? WHERE id = ?')
+      .run(city.trim(), Date.now(), req.params.id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    res.json({ success: true });
+  });
+
+  // DELETE /places/:id - delete a consolidated location entry
+  app.delete('/places/:id', (req, res) => {
+    const db = getDatabase();
+    const result = db.prepare('DELETE FROM consolidated_locations WHERE id = ?').run(req.params.id);
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    // Update total_locations in sync_metadata
+    const count = db.prepare('SELECT COUNT(*) as count FROM consolidated_locations').get();
+    db.prepare('UPDATE sync_metadata SET total_locations = ? WHERE id = 1').run(count.count);
+    res.json({ success: true });
   });
 
   return new Promise((resolve) => {

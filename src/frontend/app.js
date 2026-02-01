@@ -17,14 +17,18 @@ async function fetchTimeline(offset = 0, limit = PAGE_SIZE) {
   return res.json();
 }
 
+let currentView = 'timeline';
+
 function showView(view) {
   $loading.classList.add('hidden');
   $emptyState.classList.add('hidden');
   $timelineContainer.classList.add('hidden');
+  $placesContainer.classList.add('hidden');
 
   if (view === 'loading') $loading.classList.remove('hidden');
   else if (view === 'empty') $emptyState.classList.remove('hidden');
   else if (view === 'timeline') $timelineContainer.classList.remove('hidden');
+  else if (view === 'places') $placesContainer.classList.remove('hidden');
 }
 
 function renderTimeline(locations) {
@@ -184,6 +188,31 @@ $initialRefreshBtn.addEventListener('click', async () => {
     $initialRefreshBtn.disabled = false;
     $initialRefreshBtn.textContent = 'Sync Photos';
   }
+});
+
+// Convert vertical scroll to horizontal scroll on the timeline
+document.addEventListener('wheel', (e) => {
+  if ($timelineContainer.classList.contains('hidden')) return;
+  e.preventDefault();
+  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  $timelineContainer.scrollLeft -= delta * 2;
+}, { passive: false });
+
+// Navbar tab switching
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const view = tab.dataset.view;
+    currentView = view;
+
+    if (view === 'timeline') {
+      showView('timeline');
+    } else if (view === 'places') {
+      loadPlaces().then(() => showView('places'));
+    }
+  });
 });
 
 // Initialize

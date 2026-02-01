@@ -99,7 +99,8 @@ $homeLocation.addEventListener('change', async () => {
     body: JSON.stringify({ home_state, home_country })
   });
 
-  // Reload timeline since consolidation changed
+  // Reload views since consolidation changed
+  if (typeof reloadPlaces === 'function') reloadPlaces();
   if (typeof loadTimeline === 'function') {
     await loadTimeline();
   }
@@ -143,7 +144,7 @@ $refreshBtn.addEventListener('click', async () => {
     const data = await res.json();
     if (data.success) {
       await loadSettingsData();
-      // Reload timeline in main app
+      if (typeof reloadPlaces === 'function') reloadPlaces();
       if (typeof loadTimeline === 'function') {
         await loadTimeline();
       }
@@ -166,6 +167,7 @@ $fullRefreshBtn.addEventListener('click', async () => {
     const data = await res.json();
     if (data.success) {
       await loadSettingsData();
+      if (typeof reloadPlaces === 'function') reloadPlaces();
       if (typeof loadTimeline === 'function') {
         await loadTimeline();
       }

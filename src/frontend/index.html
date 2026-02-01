@@ -9,15 +9,21 @@
 </head>
 <body>
   <div id="app">
-    <!-- Settings button -->
-    <button id="settings-btn" class="settings-btn" aria-label="Settings">
-      <span class="material-icons">settings</span>
-    </button>
+    <!-- Top bar: nav + settings -->
+    <nav class="navbar">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="timeline">Timeline</button>
+        <button class="nav-tab" data-view="places">Places</button>
+      </div>
+      <button id="settings-btn" class="settings-btn" aria-label="Settings">
+        <span class="material-icons">settings</span>
+      </button>
+    </nav>
 
     <!-- Loading state -->
     <div id="loading" class="loading">
       <div class="loading-spinner"></div>
-      <p>Loading timeline...</p>
+      <p>Loading...</p>
     </div>
 
     <!-- Empty state -->
@@ -29,6 +35,11 @@
     <!-- Timeline container -->
     <div id="timeline-container" class="timeline-container hidden">
       <div id="timeline" class="timeline"></div>
+    </div>
+
+    <!-- Places container -->
+    <div id="places-container" class="places-container hidden">
+      <div id="places" class="places"></div>
     </div>
 
     <!-- Settings panel backdrop -->
@@ -100,6 +111,7 @@
   </div>
 
   <script src="settings.js"></script>
+  <script src="places.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

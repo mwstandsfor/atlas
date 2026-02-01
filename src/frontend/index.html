@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Settings button -->
+    <button id="settings-btn" class="settings-btn" aria-label="Settings">
+      <span class="material-icons">settings</span>
+    </button>
+
+    <!-- Loading state -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading timeline...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <p>No locations found</p>
+      <button id="initial-refresh-btn" class="btn-primary">Sync Photos</button>
+    </div>
+
+    <!-- Timeline container -->
+    <div id="timeline-container" class="timeline-container hidden">
+      <div id="timeline" class="timeline"></div>
+    </div>
+
+    <!-- Settings panel backdrop -->
+    <div id="settings-backdrop" class="settings-backdrop hidden"></div>
+
+    <!-- Settings panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="settings-close" class="settings-close" aria-label="Close settings">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-section">
+          <button id="refresh-btn" class="btn-primary btn-full">
+            <span class="material-icons">refresh</span>
+            Refresh Timeline
+          </button>
+          <button id="full-refresh-btn" class="btn-secondary btn-full">
+            <span class="material-icons">sync</span>
+            Full Rebuild
+          </button>
+        </div>
+
+        <div class="settings-section">
+          <div class="setting-row">
+            <label for="home-location-select">Home</label>
+            <select id="home-location-select" class="input-select">
+              <option value="">Not set</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="setting-row">
+            <label for="test-mode-toggle">Test Mode</label>
+            <label class="toggle">
+              <input type="checkbox" id="test-mode-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-row" id="photo-limit-row">
+            <label for="photo-limit">Photo Limit</label>
+            <input type="number" id="photo-limit" min="10" max="10000" value="100" class="input-number">
+          </div>
+        </div>
+
+        <div class="settings-section settings-info">
+          <div class="info-row">
+            <span class="info-label">Last Sync</span>
+            <span id="last-sync" class="info-value">Never</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Photos Processed</span>
+            <span id="photos-processed" class="info-value">0</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">With Location</span>
+            <span id="photos-with-location" class="info-value">0</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Timeline Entries</span>
+            <span id="total-locations" class="info-value">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

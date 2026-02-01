@@ -1,0 +1,30 @@
+{
+  "name": "photo-timeline",
+  "version": "1.0.0",
+  "description": "Photo Location Timeline - Extract and display location history from Photos.app",
+  "main": "main.js",
+  "scripts": {
+    "start": "unset ELECTRON_RUN_AS_NODE && electron .",
+    "dev": "unset ELECTRON_RUN_AS_NODE && NODE_ENV=development electron .",
+    "server": "node src/backend/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mwstandsfor/atlas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mwstandsfor/atlas/issues"
+  },
+  "homepage": "https://github.com/mwstandsfor/atlas#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "bplist-parser": "^0.3.2",
+    "electron": "^33.4.11",
+    "electron-rebuild": "^3.2.9",
+    "express": "^5.2.1"
+  }
+}

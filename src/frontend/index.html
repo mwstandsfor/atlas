@@ -42,6 +42,39 @@
       <div id="places" class="places"></div>
     </div>
 
+    <!-- Place detail panel backdrop -->
+    <div id="detail-backdrop" class="detail-backdrop hidden"></div>
+
+    <!-- Place detail panel -->
+    <div id="detail-panel" class="detail-panel hidden">
+      <div class="detail-header">
+        <div class="detail-title">
+          <h2 id="detail-city"></h2>
+          <span id="detail-region" class="detail-region"></span>
+          <a id="detail-map-link" class="detail-map-link" target="_blank" rel="noopener">
+            <span class="material-icons">place</span>
+            <span>View on Google Maps</span>
+          </a>
+        </div>
+        <button id="detail-close" class="settings-close" aria-label="Close detail">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <span id="detail-visits" class="detail-stat-value"></span>
+            <span class="detail-stat-label">visits</span>
+          </div>
+          <div class="detail-stat">
+            <span id="detail-days" class="detail-stat-value"></span>
+            <span class="detail-stat-label">days</span>
+          </div>
+        </div>
+        <div id="detail-visit-list" class="detail-visit-list"></div>
+      </div>
+    </div>
+
     <!-- Settings panel backdrop -->
     <div id="settings-backdrop" class="settings-backdrop hidden"></div>
 
@@ -110,6 +143,7 @@
     </div>
   </div>
 
+  <script src="detail.js"></script>
   <script src="settings.js"></script>
   <script src="places.js"></script>
   <script src="app.js"></script>

@@ -115,48 +115,68 @@ function consolidateLocations() {
   // Clear existing consolidated data
   db.exec('DELETE FROM consolidated_locations');
 
-  // Group entries by state+country. Merge consecutive same-state entries
-  // even if there are gaps (days with no photos). Only break a group
-  // when a DIFFERENT state/country appears in between.
-  //
-  // The dayEntries are sorted by date and may have multiple states on
-  // the same day (transit days). We process them in order and merge
-  // same-state runs, only breaking when a different state interrupts.
+  // Check for home location setting
+  const homeState = getSetting('home_state') || '';
+  const homeCountry = getSetting('home_country') || '';
+  const hasHome = homeState && homeCountry;
+
+  // For home location, split day entries into per-city entries so we get
+  // city-level granularity (e.g. "Meguro" vs "Shibuya" within Tokyo).
+  // For non-home locations, keep state-level grouping as before.
+  let expandedEntries = [];
+  for (const entry of dayEntries) {
+    const isHome = hasHome && entry.state === homeState && entry.country === homeCountry;
+    if (isHome) {
+      const byCityName = {};
+      for (const city of entry.cities) {
+        if (!byCityName[city]) byCityName[city] = [];
+        byCityName[city].push(city);
+      }
+      for (const [city, cities] of Object.entries(byCityName)) {
+        expandedEntries.push({
+          date: entry.date,
+          state: entry.state,
+          country: entry.country,
+          cities: cities,
+          homeCity: city
+        });
+      }
+    } else {
+      expandedEntries.push(entry);
+    }
+  }
+
+  expandedEntries.sort((a, b) => a.date.localeCompare(b.date));
+
+  // Merge consecutive entries:
+  // - Non-home: merge by state+country (as before)
+  // - Home: merge by city+state+country (city-level granularity)
   const consolidated = [];
   let current = null;
-  let lastDifferentState = null;
 
-  for (const entry of dayEntries) {
-    if (current &&
-        current.state === entry.state &&
-        current.country === entry.country) {
-      // Same state — extend range (gaps are OK, no interruption)
+  for (const entry of expandedEntries) {
+    const isHome = hasHome && entry.state === homeState && entry.country === homeCountry;
+    const sameGroup = current &&
+      current.state === entry.state &&
+      current.country === entry.country &&
+      (!isHome || current.homeCity === entry.homeCity);
+
+    if (sameGroup) {
       current.end_date = entry.date;
       current.cities.push(...entry.cities);
     } else {
-      // Different state — save current and start new
       if (current) consolidated.push(current);
       current = {
         state: entry.state,
         country: entry.country,
         start_date: entry.date,
         end_date: entry.date,
-        cities: [...entry.cities]
+        cities: [...entry.cities],
+        homeCity: entry.homeCity || null
       };
     }
   }
   if (current) consolidated.push(current);
-
-  // Check for home location setting
-  const homeState = getSetting('home_state') || '';
-  const homeCountry = getSetting('home_country') || '';
-  const hasHome = homeState && homeCountry;
-
-  // If home is set, merge consecutive home entries that are only separated
-  // by gaps (no photos) — they're already merged by the loop above.
-  // But also: collapse adjacent home blocks that sandwich short gaps.
-  // The main loop already handles same-state merging, so home entries
-  // that aren't interrupted by travel are already one block.
 
   // Insert consolidated entries
   const insert = db.prepare(`
@@ -168,8 +188,10 @@ function consolidateLocations() {
   const batchInsert = db.transaction((entries) => {
     for (const entry of entries) {
       const isHome = hasHome && entry.state === homeState && entry.country === homeCountry;
-      // For home location, always use the state name (e.g. "Tokyo")
-      const displayCity = isHome ? entry.state : pickDisplayCity(entry.cities, entry.state);
+      // For home location, use the per-city name; for travel, use pickDisplayCity
+      const displayCity = isHome && entry.homeCity
+        ? entry.homeCity
+        : pickDisplayCity(entry.cities, entry.state);
       const startParsed = parseLocalDate(entry.start_date);
       const days = daysBetween(entry.start_date, entry.end_date) + 1;
       const displayDate = formatDateRange(entry.start_date, entry.end_date);

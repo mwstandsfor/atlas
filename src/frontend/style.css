@@ -681,6 +681,162 @@ html, body {
   transition: opacity 0.2s;
 }
 
+/* ===== PLACE DETAIL PANEL ===== */
+.detail-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.detail-backdrop.visible {
+  opacity: 1;
+}
+
+.detail-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  max-width: 90vw;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 400;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-panel.visible {
+  transform: translateX(0);
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-title h2 {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.detail-region {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  display: block;
+}
+
+.detail-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.detail-map-link:hover {
+  color: var(--text-primary);
+}
+
+.detail-map-link .material-icons {
+  font-size: 14px;
+}
+
+.detail-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.detail-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.detail-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.detail-stat-value {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.detail-stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.detail-visit-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-visit {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-visit:last-child {
+  border-bottom: none;
+}
+
+.detail-visit-date {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.detail-visit-year {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.detail-visit-days {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Clickable entries */
+.timeline-entry .location-info {
+  cursor: pointer;
+}
+
+.timeline-entry .location-info:hover .city {
+  color: #fff;
+}
+
+.places-item {
+  cursor: pointer;
+}
+
+.places-item:hover {
+  color: #fff;
+}
+
 /* ===== CONTEXT MENU ===== */
 .places-context-menu {
   position: fixed;
@@ -758,16 +914,16 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0 32px 0 48px;
+    padding: 0 16px 0 40vw;
     min-width: auto;
     position: relative;
   }
 
-  /* Vertical line on left instead of horizontal */
+  /* Vertical line on left */
   .timeline::after {
     top: 0;
     bottom: 0;
-    left: 35px;
+    left: calc(40vw - 14px);
     right: auto;
     width: var(--line-width);
     height: auto;
@@ -783,7 +939,7 @@ html, body {
 
   .timeline-entry .dot {
     position: absolute;
-    left: -16px;
+    left: -17px;
     top: 6px;
   }
 
@@ -804,15 +960,50 @@ html, body {
     font-size: 12px;
   }
 
-  /* Headers in vertical */
+  /* Headers — shifted left of the vertical line */
   .timeline-header,
   .timeline-month-header {
-    align-items: flex-start;
-    padding: 8px 0 16px 0;
+    position: relative;
+    left: calc(-40vw + 22px);
+    width: calc(40vw - 42px);
+    height: auto;
+    margin-top: 16px;
+    margin-bottom: 0;
+    padding: 0;
+    align-items: flex-end;
   }
 
   .timeline-header .year-label {
-    font-size: 24px;
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .timeline-header .month-label {
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  .timeline-month-header .month-label {
+    font-size: 10px;
+  }
+
+  /* Detail panel from bottom on mobile */
+  .detail-panel {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+  }
+
+  .detail-panel.visible {
+    transform: translateY(0);
   }
 
   /* Settings panel from bottom on mobile */

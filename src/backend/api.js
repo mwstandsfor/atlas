@@ -118,6 +118,34 @@ function startBackendServer(port) {
     res.json(states);
   });
 
+  // GET /place-detail - visit history for a specific place
+  app.get('/place-detail', (req, res) => {
+    const { city, state, country } = req.query;
+    if (!city || !state || !country) {
+      return res.status(400).json({ error: 'city, state, and country are required' });
+    }
+
+    const db = getDatabase();
+    const visits = db.prepare(`
+      SELECT id, start_date, end_date, days_stayed, display_date, year, month_name
+      FROM consolidated_locations
+      WHERE city = ? AND state = ? AND country = ?
+      ORDER BY start_date DESC
+    `).all(city, state, country);
+
+    const totalVisits = visits.length;
+    const totalDays = visits.reduce((sum, v) => sum + v.days_stayed, 0);
+
+    res.json({
+      city,
+      state,
+      country,
+      totalVisits,
+      totalDays,
+      visits
+    });
+  });
+
   // GET /places - unique places grouped by country > state
   app.get('/places', (req, res) => {
     const db = getDatabase();

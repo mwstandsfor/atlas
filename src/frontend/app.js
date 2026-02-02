@@ -71,11 +71,10 @@ function renderTimeline(locations) {
       lastMonth = month;
     }
 
-    // Show "City" when city==state (e.g. "Tokyo"), or "City, State" when
-    // the city is a specific town within a larger state (e.g. "Kusatsu, Gunma")
-    const cityLabel = (!loc.state || loc.city === loc.state)
-      ? escapeHtml(loc.city)
-      : `${escapeHtml(loc.city)}, ${escapeHtml(loc.state)}`;
+    const cityLabel = escapeHtml(loc.city);
+    const countryLabel = (!loc.state || loc.state === loc.country)
+      ? escapeHtml(loc.country)
+      : `${escapeHtml(loc.state)}, ${escapeHtml(loc.country)}`;
 
     const entry = document.createElement('div');
     entry.className = 'timeline-entry';
@@ -83,10 +82,15 @@ function renderTimeline(locations) {
       <div class="dot"></div>
       <div class="location-info">
         <div class="city">${cityLabel}</div>
-        <div class="country">${escapeHtml(loc.country)}</div>
+        <div class="country">${countryLabel}</div>
         <div class="date-range">${escapeHtml(loc.display_date)}</div>
       </div>
     `;
+
+    entry.querySelector('.location-info').addEventListener('click', () => {
+      openPlaceDetail(loc.city, loc.state, loc.country);
+    });
+
     $timeline.appendChild(entry);
   }
 
@@ -208,7 +212,11 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     currentView = view;
 
     if (view === 'timeline') {
-      showView('timeline');
+      if (allLocations.length === 0) {
+        loadTimeline();
+      } else {
+        showView('timeline');
+      }
     } else if (view === 'places') {
       loadPlaces().then(() => showView('places'));
     }

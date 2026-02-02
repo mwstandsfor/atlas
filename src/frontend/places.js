@@ -139,6 +139,11 @@ function renderPlaces(data) {
         item.className = 'places-item';
         item.textContent = place.city;
 
+        // Tap to open detail
+        item.addEventListener('click', () => {
+          openPlaceDetail(place.city, stateGroup.state, group.country);
+        });
+
         // Right-click (desktop)
         item.addEventListener('contextmenu', (e) => {
           e.preventDefault();
@@ -235,10 +240,16 @@ async function deletePlace(itemEl, place) {
 
 async function refreshAll() {
   placesLoaded = false;
+  const scrollTop = $placesContainer.scrollTop;
   const res = await fetch('/places');
   placesData = await res.json();
   renderPlaces(placesData);
+  placesLoaded = true;
+  $placesContainer.scrollTop = scrollTop;
+  // Mark timeline as stale so it reloads when user switches back
   if (typeof loadTimeline === 'function') {
-    loadTimeline();
+    currentOffset = 0;
+    allLocations = [];
+    hasMore = true;
   }
 }

@@ -4,7 +4,8 @@ const DEFAULTS = {
   test_mode: 'false',
   photo_limit: '100',
   home_state: '',
-  home_country: ''
+  home_country: '',
+  photos_library_path: ''
 };
 
 function getSetting(key) {
@@ -27,7 +28,8 @@ function getAllSettings() {
     test_mode: getSetting('test_mode') === 'true',
     photo_limit: parseInt(getSetting('photo_limit'), 10) || 100,
     home_state: getSetting('home_state') || '',
-    home_country: getSetting('home_country') || ''
+    home_country: getSetting('home_country') || '',
+    photos_library_path: getSetting('photos_library_path') || ''
   };
 }
 

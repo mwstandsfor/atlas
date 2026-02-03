@@ -3,6 +3,7 @@ const os = require('os');
 
 const PORT = 9001;
 
+// Default Photos library path - will be overridable in settings
 const PHOTOS_DB_PATH = path.join(
   os.homedir(),
   'Pictures/Photos Library.photoslibrary/database/Photos.sqlite'

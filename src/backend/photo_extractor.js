@@ -5,6 +5,7 @@ const os = require('os');
 const fs = require('fs');
 const { PHOTOS_DB_PATH, APPLE_EPOCH_OFFSET } = require('../shared/constants');
 const { getDatabase } = require('./database');
+const { getSetting } = require('./config');
 
 const PHOTOS_QUERY = `
   SELECT
@@ -18,10 +19,22 @@ const PHOTOS_QUERY = `
 `;
 
 function openPhotosDatabase() {
-  if (!fs.existsSync(PHOTOS_DB_PATH)) {
-    throw new Error(`Photos database not found at: ${PHOTOS_DB_PATH}`);
+  // Check if user has configured a custom Photos library path
+  const customPhotosPath = getSetting('photos_library_path');
+  
+  let photosDbPath;
+  if (customPhotosPath && fs.existsSync(customPhotosPath)) {
+    photosDbPath = customPhotosPath;
+  } else {
+    // Use default path if no custom path is set or it doesn't exist
+    photosDbPath = PHOTOS_DB_PATH;
   }
-  return new Database(PHOTOS_DB_PATH, { readonly: true });
+  
+  if (!fs.existsSync(photosDbPath)) {
+    throw new Error(`Photos database not found at: ${photosDbPath}`);
+  }
+  
+  return new Database(photosDbPath, { readonly: true });
 }
 
 function parseLocationBlob(blob) {

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; connect-src 'self' http://localhost:*; img-src 'self' data:">
   <title>Atlas</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="style.css">
@@ -99,11 +100,27 @@
         </div>
 
         <div class="settings-section">
-          <div class="setting-row">
+          <div class="setting-column">
             <label for="home-location-select">Home</label>
             <select id="home-location-select" class="input-select">
               <option value="">Not set</option>
             </select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="setting-row setting-column">
+            <div class="setting-row-label-container">
+              <label for="photos-library-path">Photos Library Path</label>
+              <div class="setting-hint">Click to select a custom Photos library</div>
+            </div>
+            <div class="photos-library-container">
+              <span id="photos-library-display" class="photos-library-path">Default (iCloud Photos)</span>
+              <button id="photos-library-select-btn" class="btn-secondary btn-small">
+                <span class="material-icons">folder_open</span>
+                Browse
+              </button>
+            </div>
           </div>
         </div>
 

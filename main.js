@@ -1,10 +1,17 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const os = require('os');
 const { spawn, execSync } = require('child_process');
 const { PORT } = require('./src/shared/constants');
 
 let mainWindow;
 let serverProcess;
+
+// Default iCloud Photos library path for macOS
+const DEFAULT_PHOTOS_LIBRARY_PATH = path.join(
+  os.homedir(),
+  'Pictures/Photos Library.photoslibrary/database/Photos.sqlite'
+);
 
 function findSystemNode() {
   // Find the system Node.js (not Electron's bundled one)
@@ -73,6 +80,28 @@ function createWindow() {
   });
 }
 
+// IPC handler for selecting Photos library directory
+ipcMain.handle('select-photos-library', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Photos Library',
+    defaultPath: path.join(os.homedir(), 'Pictures'),
+    properties: ['openDirectory'],
+    filters: [
+      { name: 'Photos Libraries', extensions: ['photoslibrary'] }
+    ],
+    buttonLabel: 'Select Library'
+  });
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    // Construct the path to the Photos.sqlite database
+    const libraryPath = result.filePaths[0];
+    const databasePath = path.join(libraryPath, 'database/Photos.sqlite');
+    return databasePath;
+  }
+  
+  return null;
+});
+
 app.whenReady().then(async () => {
   await startBackend();
   createWindow();
@@ -95,3 +124,4 @@ app.on('quit', () => {
     serverProcess.kill();
   }
 });
+

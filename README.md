@@ -1,6 +1,7 @@
 # Photo Timeline (Atlas)
 
-Photo Timeline is a desktop application that extracts location data from Apple Photos.app and displays it in an organized timeline format.
+Photo Timeline is an application that extracts location data from Apple Photos.app and displays it in an organized timeline format.
+
 
 ## Features
 
@@ -9,8 +10,6 @@ Photo Timeline is a desktop application that extracts location data from Apple P
 - Organizes locations by country and state
 - Allows editing/deleting location entries
 - Custom Photos library path configuration
-- Test mode for limited processing
-- Full rebuild capability
 
 ## Prerequisites
 
@@ -144,3 +143,18 @@ ISC License
 ## Contributing
 
 Contributions are welcome! Please submit issues and pull requests to the GitHub repository.
+
+
+## Ending
+
+- If running in a terminal: Press Ctrl+C to stop the process
+- If it's an Electron app (which this project appears to be): Close the app window, or press Ctrl+C in the terminal where you ran it
+- If running in the background: Run pkill -f "node main.js" or pkill -f electron to kill the process
+
+# Check for node/electron processes
+ps aux | grep -i electron
+ps aux | grep node
+
+# Or check if a specific port is in use
+lsof -i :<port_number>
+kill <PID>

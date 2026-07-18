@@ -9,3 +9,5 @@ out/
 # Claude stuff 
 CLAUDE.md
 .claude/
+/.tombstone
+/.pi

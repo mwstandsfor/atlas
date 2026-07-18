@@ -24,7 +24,9 @@
     "better-sqlite3": "^12.6.2",
     "bplist-parser": "^0.3.2",
     "electron": "^33.4.11",
-    "electron-rebuild": "^3.2.9",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.1.0"
   }
 }
